@@ -128,7 +128,7 @@ module Language
         python_path = if use_python_from_path
           "/usr/bin/env python3"
         else
-          python_deps = formula.deps.map(&:name).grep(/^python(@.+)?$/)
+          python_deps = formula.deps.select(&:required?).map(&:name).grep(/^python(@.+)?$/)
           raise ShebangDetectionError.new("Python", "formula does not depend on Python") if python_deps.empty?
           if python_deps.length > 1
             raise ShebangDetectionError.new("Python", "formula has multiple Python dependencies")
@@ -366,7 +366,11 @@ module Language
           targets = Array(targets)
           targets.each do |t|
             if t.is_a?(Resource)
-              t.stage { do_install(Pathname.pwd, build_isolation:) }
+              t.stage do
+                target = Pathname.pwd
+                target /= t.downloader.basename if t.url&.end_with?("-none-any.whl")
+                do_install(target, build_isolation:)
+              end
             else
               t = t.lines.map(&:strip) if t.is_a?(String) && t.include?("\n")
               do_install(t, build_isolation:)

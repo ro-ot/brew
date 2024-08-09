@@ -514,6 +514,16 @@ The `std_*_args` methods, as well as the arguments they pass, are:
 "--wrap-mode=nofallback"
 ```
 
+#### `std_npm_args`
+
+```ruby
+"-ddd"
+"--global"
+"--build-from-source"
+"--cache=$(brew --cache)/npm_cache"
+"--prefix=#{libexec}"
+```
+
 #### `std_pip_args`
 
 ```ruby
@@ -985,7 +995,7 @@ class Foo < Formula
   url "https://example.com/foo-1.0.tar.gz"
 
   def post_install
-    rm_f pkgetc/"cert.pem"
+    rm pkgetc/"cert.pem" if File.exist?(pkgetc/"cert.pem")
     pkgetc.install_symlink Formula["ca-certificates"].pkgetc/"cert.pem"
   end
   # ...

@@ -264,6 +264,8 @@ module Kernel
 
   # Kernel.system but with exceptions.
   def safe_system(cmd, *args, **options)
+    require "utils"
+
     return if Homebrew.system(cmd, *args, **options)
 
     raise ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS)
@@ -273,6 +275,8 @@ module Kernel
   #
   # @api internal
   def quiet_system(cmd, *args)
+    require "utils"
+
     Homebrew._system(cmd, *args) do
       # Redirect output streams to `/dev/null` instead of closing as some programs
       # will fail to execute if they can't write to an open stream.
@@ -421,7 +425,7 @@ module Kernel
   end
 
   # Ensure the given executable is exist otherwise install the brewed version
-  def ensure_executable!(name, formula_name = nil, reason: "")
+  def ensure_executable!(name, formula_name = nil, reason: "", latest: false)
     formula_name ||= name
 
     executable = [
@@ -434,7 +438,7 @@ module Kernel
     ].compact.first
     return executable if executable.exist?
 
-    ensure_formula_installed!(formula_name, reason:).opt_bin/name
+    ensure_formula_installed!(formula_name, reason:, latest:).opt_bin/name
   end
 
   def paths

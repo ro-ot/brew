@@ -269,7 +269,7 @@ module Homebrew
         # comparison.
         current = if formula
           if formula.head_only?
-            formula.any_installed_version.version.commit
+            Version.new(formula.any_installed_version.version.commit)
           else
             T.must(formula.stable).version
           end
@@ -281,7 +281,7 @@ module Homebrew
         current = LivecheckVersion.create(formula_or_cask, current)
 
         latest = if formula&.head_only?
-          T.must(formula.head).downloader.fetch_last_commit
+          Version.new(T.must(formula.head).downloader.fetch_last_commit)
         else
           version_info = latest_version(
             formula_or_cask,
@@ -715,7 +715,6 @@ module Homebrew
         strategies = Strategy.from_url(
           url,
           livecheck_strategy:,
-          url_provided:       livecheck_url.present?,
           regex_provided:     livecheck_regex.present?,
           block_provided:     livecheck_strategy_block.present?,
         )
@@ -930,7 +929,6 @@ module Homebrew
         strategies = Strategy.from_url(
           url,
           livecheck_strategy:,
-          url_provided:       livecheck_url.present?,
           regex_provided:     livecheck_regex.present?,
           block_provided:     livecheck_strategy_block.present?,
         )

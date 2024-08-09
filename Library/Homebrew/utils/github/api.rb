@@ -137,6 +137,7 @@ module GitHub
 
     sig { returns(T.nilable(String)) }
     private_class_method def self.uid_home
+      require "etc"
       Etc.getpwuid(Process.uid)&.dir
     rescue ArgumentError
       # Cover for misconfigured NSS setups
@@ -176,8 +177,9 @@ module GitHub
                                                        print_stderr: false
         return unless result.success?
 
-        github_username = git_credential_out[/username=(.+)/, 1]
-        github_password = git_credential_out[/password=(.+)/, 1]
+        git_credential_out.force_encoding("ASCII-8BIT")
+        github_username = git_credential_out[/^username=(.+)/, 1]
+        github_password = git_credential_out[/^password=(.+)/, 1]
         return unless github_username
 
         # Don't use passwords from the keychain unless they look like

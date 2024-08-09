@@ -115,6 +115,8 @@ module RuboCop
     module FormulaAuditStrict
       # This cop contains stricter checks for various problems in a formula's source code.
       class Text < FormulaCop
+        extend AutoCorrector
+
         sig { override.params(formula_nodes: FormulaNodes).void }
         def audit_formula(formula_nodes)
           return if (body_node = formula_nodes.body_node).nil?
@@ -138,9 +140,13 @@ module RuboCop
           end
 
           interpolated_bin_path_starts_with(body_node, "/#{@formula_name}") do |bin_node|
+            next if bin_node.ancestors.any?(&:array_type?)
+
             offending_node(bin_node)
             cmd = bin_node.source.match(%r{\#{bin}/(\S+)})[1]&.delete_suffix('"') || @formula_name
-            problem "Use `bin/\"#{cmd}\"` instead of `\"\#{bin}/#{cmd}\"`"
+            problem "Use `bin/\"#{cmd}\"` instead of `\"\#{bin}/#{cmd}\"`" do |corrector|
+              corrector.replace(bin_node.loc.expression, "bin/\"#{cmd}\"")
+            end
           end
 
           return if formula_tap != "homebrew-core"
@@ -158,6 +164,8 @@ module RuboCop
         end
 
         def path_starts_with_bin?(path, starts_with)
+          return false if path.include?(" ")
+
           path_starts_with?(path, starts_with, bin: true)
         end
 
