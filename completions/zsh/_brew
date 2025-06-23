@@ -486,7 +486,6 @@ _brew_audit() {
     '--skip-style[Skip running non-RuboCop style checks. Useful if you plan on running `brew style` separately. Enabled by default unless a formula is specified by name]' \
     '(--only-cops --except-cops)--strict[Run additional, stricter style checks]' \
     '--tap[Check formulae and casks within the given tap, specified as user`/`repo]' \
-    '--token-conflicts[Audit for token conflicts]' \
     '--verbose[Make some output more verbose]' \
     - formula \
     '(--cask)--formula[Treat all named arguments as formulae]' \
@@ -2081,6 +2080,7 @@ _brew_tests() {
     '--fail-fast[Exit early on the first failing test]' \
     '--generic[Run only OS-agnostic tests]' \
     '--help[Show this message]' \
+    '--no-parallel[Run tests serially]' \
     '--online[Include tests that use the GitHub API and tests that use any of the taps for official external commands]' \
     '(--changed)--only[Run only `test_script_spec.rb`. Appending `:line_number` will start at a specific line]' \
     '--profile[Run the test suite serially to find the n slowest tests]' \
